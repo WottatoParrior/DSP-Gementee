@@ -33,6 +33,7 @@ To do that:
 python3 -m venv .venv
 
 source .venv/bin/activate # linux
+
 .\.venv/scripts/activate # windows
 
 pip install -r requirements.txt
