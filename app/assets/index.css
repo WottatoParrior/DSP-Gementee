@@ -1,0 +1,17 @@
+.head {
+  font-weight: 900;
+  font-size: 25px;
+}
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+  background-color: purple;
+  color: white;
+}
+
+.nav-pills .nav-link {
+  color: #808080;
+}
+.nav-link:focus,
+.nav-link:hover {
+  color: black;
+}
