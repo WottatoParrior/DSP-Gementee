@@ -25,6 +25,13 @@ If there is something here that is missing let me know so I can add it :)
 
 
 # Usage
+First you need to get this project, navigate to the folder you want to download the project and open a command prompt there.
+Use :
+
+git clone https://github.com/WottatoParrior/DSP-Gementee.git
+
+This will download the project to the folder and set up everything you need to create branches,pull and push stuff.
+
 
 The correct way is to setup a virtual enviornment and install all the dependencies there, so everyone
 who uses this project runs the same dependencies and to prevent clashes with current installations.
