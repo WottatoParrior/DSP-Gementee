@@ -8,6 +8,9 @@ import pandas as pd
 
 from components.table.table import generate_table
 from components.sidebar.sidebar import generate_sidebar
+from components.datepicker.datepicker import generate_date_hour_picker
+
+image_filename = "assets/MetroMap.svg"
 
 app = dash.Dash(__name__, external_stylesheets=[
     dbc.themes.BOOTSTRAP,
@@ -20,7 +23,20 @@ app.layout = generate_sidebar()
 def render_page_content(pathname):
     if pathname == "/":
         return [
-            html.H1('General stuff', style={'textAlign': 'center'}),
+            # html.H1('General stuff', style={'textAlign': 'center'}),
+            generate_date_hour_picker(),
+            html.Div(className="container",
+                     children=[
+                         html.Img(src=image_filename, className="metro-svg"),
+                         html.Div(id="Centraal"),
+                         html.Div(id="Spaklerweg"),
+                         html.Div(id="VanDerMadeweg"),
+                         html.Div(id="Zuid"),
+                         html.Div(id="Bijlmer"),
+                         html.Div(id="Strandvliet"),
+                         html.Div(id="Duivendrecht"),
+                     ])
+
             # dcc.Graph(id='bargraph',
             #           figure=px.bar(
             #               df,
