@@ -9,6 +9,7 @@ import pandas as pd
 from components.table.table import generate_table
 from components.sidebar.sidebar import generate_sidebar
 from components.datepicker.datepicker import generate_date_hour_picker
+from components.venues_modal.venues_modal import generate_venues_modal
 
 image_filename = "assets/MetroMap.svg"
 
@@ -35,8 +36,8 @@ def render_page_content(pathname):
                          html.Div(id="Bijlmer"),
                          html.Div(id="Strandvliet"),
                          html.Div(id="Duivendrecht"),
-                     ])
-
+                     ]),
+            generate_venues_modal()
             # dcc.Graph(id='bargraph',
             #           figure=px.bar(
             #               df,
