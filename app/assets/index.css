@@ -30,7 +30,9 @@
 .slider {
   padding-top: 20px !important;
 }
-
+.DateInput {
+  width: 160px;
+}
 .venues-modal {
   width: 400px;
   height: 300px;

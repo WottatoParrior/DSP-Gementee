@@ -1,11 +1,20 @@
 from dash import dcc, html
+from app import app
 import dash_bootstrap_components as dbc
 import pandas as pd
+from dash.dependencies import Input, Output
 
 df = pd.read_csv("../data/venues.csv")
 
 
-def generate_venues_modal():
+@app.callback(Output('graph-with-slider', 'figure'),
+              Input('hour-slider', 'value'))
+def update_venues(selected_hour):
+    print(selected_hour)
+    return selected_hour
+
+
+def generate_venues_modal(values):
     return html.Div(
         className="venues-modal",
         children=[
@@ -22,7 +31,7 @@ def generate_venues_modal():
                                           className="venue-name",
                                       ),
                                       html.H2(
-                                          "Number",
+                                          values[0],
                                           className="venue-numbers",
                                       ),
                                       html.H2(
@@ -37,7 +46,7 @@ def generate_venues_modal():
                                           className="venue-name",
                                       ),
                                       html.H2(
-                                          "Number",
+                                          values[1],
                                           className="venue-numbers",
                                       ),
                                       html.H2(
@@ -52,7 +61,7 @@ def generate_venues_modal():
                                           className="venue-name",
                                       ),
                                       html.H2(
-                                          "Number",
+                                          values[2],
                                           className="venue-numbers",
                                       ),
                                       html.H2(
@@ -67,7 +76,7 @@ def generate_venues_modal():
                                           className="venue-name",
                                       ),
                                       html.H2(
-                                          "Number",
+                                          values[3],
                                           className="venue-numbers",
                                       ),
                                       html.H2(

@@ -8,7 +8,8 @@ def generate_datepicker():
 
 
 def generate_day_slider():
-    return dcc.Slider(min=5,
+    return dcc.Slider(id="hour-slider",
+                      min=5,
                       max=24,
                       step=None,
                       marks={
