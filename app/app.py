@@ -5,6 +5,7 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 import plotly.express as px
 import pandas as pd
+from helpers.helpers import create_filter_venues, create_filter_stations
 
 # styling the sidebar
 SIDEBAR_STYLE = {
@@ -23,7 +24,8 @@ CONTENT_STYLE = {
     "margin-right": "2rem",
     "padding": "2rem 1rem",
 }
-df = pd.read_csv("../data/venues.csv")
+df_venues = pd.read_csv("../data/venues.csv")
+df_events = pd.read_csv("../data/events.csv")
 
 image_filename = "assets/MetroMap.svg"
 
@@ -98,13 +100,13 @@ def render_page_content(pathname):
             html.Div(className="container",
                      children=[
                          html.Img(src=image_filename, className="metro-svg"),
-                         html.Div(id="Centraal"),
-                         html.Div(id="Spaklerweg"),
-                         html.Div(id="VanDerMadeweg"),
-                         html.Div(id="Zuid"),
-                         html.Div(id="Bijlmer"),
-                         html.Div(id="Strandvliet"),
-                         html.Div(id="Duivendrecht"),
+                         html.Div(id="Centraal", className="station"),
+                         html.Div(id="Spaklerweg", className="station"),
+                         html.Div(id="VanDerMadeweg", className="station"),
+                         html.Div(id="Zuid", className="station"),
+                         html.Div(id="Bijlmer", className="station"),
+                         html.Div(id="Strandvliet", className="station"),
+                         html.Div(id="Duivendrecht", className="station"),
                      ]),
             html.Div(
                 className="venues-modal",
@@ -176,6 +178,32 @@ def render_page_content(pathname):
                                               ),
                                           ]),
                              ]),
+                ]),
+            html.Div(
+                className="events-modal",
+                children=[
+                    # html.Img(src=, className="metro-svg"),
+                    html.H2("Events",
+                            className="head",
+                            style={"padding": "0px 0px 10px 10px"}),
+                    html.Div(className="event-container",
+                             children=[
+                                 html.Div(className="event",
+                                          children=[
+                                              html.H2(
+                                                  "ArenA",
+                                                  className="venue-name",
+                                              ),
+                                              html.H2(
+                                                  id="noull",
+                                                  className="venue-numbers",
+                                              ),
+                                              html.H2(
+                                                  "/54900",
+                                                  className="venue-numbers",
+                                              ),
+                                          ]),
+                             ]),
                 ])
             # dcc.Graph(id='bargraph',
             #           figure=px.bar(
@@ -216,67 +244,83 @@ def render_page_content(pathname):
     ])
 
 
+@app.callback(Output('Centraal', 'style'), Input('hour-slider', 'value'),
+              Input('date-picker', 'date'))
+def update_style_Centraal(selected_hour, date):
+    return create_filter_stations(selected_hour, date, df_events,
+                                  "Centraal Station")
+
+
+@app.callback(Output('Strandvliet', 'style'), Input('hour-slider', 'value'),
+              Input('date-picker', 'date'))
+def update_style_Strandvliet(selected_hour, date):
+    return create_filter_stations(selected_hour, date, df_events,
+                                  "Strandvliet")
+
+
+@app.callback(Output('Spaklerweg', 'style'), Input('hour-slider', 'value'),
+              Input('date-picker', 'date'))
+def update_style_Spaklerweg(selected_hour, date):
+    return create_filter_stations(selected_hour, date, df_events, "Spaklerweg")
+
+
+@app.callback(Output('VanDerMadeweg', 'style'), Input('hour-slider', 'value'),
+              Input('date-picker', 'date'))
+def update_style_VanDerMadeweg(selected_hour, date):
+    return create_filter_stations(selected_hour, date, df_events,
+                                  "Van der Madeweg")
+
+
+@app.callback(Output('Zuid', 'style'), Input('hour-slider', 'value'),
+              Input('date-picker', 'date'))
+def update_style_Zuid(selected_hour, date):
+    return create_filter_stations(selected_hour, date, df_events,
+                                  "Station Zuid")
+
+
+@app.callback(Output('Bijlmer', 'style'), Input('hour-slider', 'value'),
+              Input('date-picker', 'date'))
+def update_style_Bijlmer(selected_hour, date):
+    return create_filter_stations(selected_hour, date, df_events,
+                                  "Station Bijlmer ArenA")
+
+
+@app.callback(Output('Duivendrecht', 'style'), Input('hour-slider', 'value'),
+              Input('date-picker', 'date'))
+def update_style_Duivendrecht(selected_hour, date):
+    return create_filter_stations(selected_hour, date, df_events,
+                                  "Station Duivendrecht")
+
+
 @app.callback(Output('arena', 'children'), Input('hour-slider', 'value'),
               Input('date-picker', 'date'))
 def update_venue(selected_hour, date):
-    if selected_hour > 9:
-        parsed_hour = selected_hour
-    elif selected_hour == 24:
-        parsed_hour = "0"
-    else:
-        parsed_hour = "0" + str(selected_hour)
-    filter = "{date} {selected_hour}:00:00".format(date=date,
-                                                   selected_hour=parsed_hour)
-
-    filtered_df = df[df["Time_to_filter"] == filter]
+    filter = create_filter_venues(selected_hour, date)
+    filtered_df = df_venues[df_venues["Time_to_filter"] == filter]
     return filtered_df["At_ArenA_beginning_of_hour"]
 
 
 @app.callback(Output('toekmost', 'children'), Input('hour-slider', 'value'),
               Input('date-picker', 'date'))
 def update_venue(selected_hour, date):
-    if selected_hour > 9:
-        parsed_hour = selected_hour
-    elif selected_hour == 24:
-        parsed_hour = "0"
-    else:
-        parsed_hour = "0" + str(selected_hour)
-    filter = "{date} {selected_hour}:00:00".format(date=date,
-                                                   selected_hour=parsed_hour)
-
-    filtered_df = df[df["Time_to_filter"] == filter]
+    filter = create_filter_venues(selected_hour, date)
+    filtered_df = df_venues[df_venues["Time_to_filter"] == filter]
     return filtered_df["At_De_Toekmost_beginning_of_hour"]
 
 
 @app.callback(Output('afas', 'children'), Input('hour-slider', 'value'),
               Input('date-picker', 'date'))
 def update_venue(selected_hour, date):
-    if selected_hour > 9:
-        parsed_hour = selected_hour
-    elif selected_hour == 24:
-        parsed_hour = "0"
-    else:
-        parsed_hour = "0" + str(selected_hour)
-    filter = "{date} {selected_hour}:00:00".format(date=date,
-                                                   selected_hour=parsed_hour)
-
-    filtered_df = df[df["Time_to_filter"] == filter]
+    filter = create_filter_venues(selected_hour, date)
+    filtered_df = df_venues[df_venues["Time_to_filter"] == filter]
     return filtered_df["At_AFAS_beginning_of_hour"]
 
 
 @app.callback(Output('ziggo', 'children'), Input('hour-slider', 'value'),
               Input('date-picker', 'date'))
 def update_venue(selected_hour, date):
-    if selected_hour > 9:
-        parsed_hour = selected_hour
-    elif selected_hour == 24:
-        parsed_hour = "0"
-    else:
-        parsed_hour = "0" + str(selected_hour)
-    filter = "{date} {selected_hour}:00:00".format(date=date,
-                                                   selected_hour=parsed_hour)
-
-    filtered_df = df[df["Time_to_filter"] == filter]
+    filter = create_filter_venues(selected_hour, date)
+    filtered_df = df_venues[df_venues["Time_to_filter"] == filter]
     return filtered_df["At_Ziggo_beginning_of_hour"]
 
 
