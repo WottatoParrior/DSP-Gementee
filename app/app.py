@@ -6,6 +6,7 @@ from dash.dependencies import Input, Output
 import plotly.express as px
 import pandas as pd
 from helpers.helpers import create_filter_venues, create_filter_stations
+import plotly.graph_objects as go
 
 # styling the sidebar
 SIDEBAR_STYLE = {
@@ -24,6 +25,39 @@ CONTENT_STYLE = {
     "margin-right": "2rem",
     "padding": "2rem 1rem",
 }
+
+# stations_capacity = [
+#     50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750,
+#     800, 850
+# ]
+# stations_capacity_figure = go.Figure()
+
+# stations_capacity_figure.add_trace(
+#     go.Scatter(
+#         x=[72, 67, 73, 80, 76, 79, 84, 78, 86, 93, 94, 90, 92, 96, 94, 112],
+#         y=stations_capacity,
+#         marker=dict(color="crimson", size=12),
+#         mode="markers",
+#         name="Women",
+#     ))
+
+# stations_capacity_figure.add_trace(
+#     go.Scatter(
+#         x=[
+#             92, 94, 100, 107, 112, 114, 114, 118, 119, 124, 131, 137, 141, 151,
+#             152, 165
+#         ],
+#         y=stations_capacity,
+#         marker=dict(color="gold", size=12),
+#         mode="markers",
+#         name="Men",
+#     ))
+
+# stations_capacity_figure.update_layout(
+#     title="Gender Earnings Disparity",
+#     xaxis_title="Annual Salary (in thousands)",
+#     yaxis_title="School")
+
 df_venues = pd.read_csv("../data/venues.csv")
 df_events = pd.read_csv("../data/events.csv")
 
@@ -63,16 +97,20 @@ app.layout = html.Div([
 def render_page_content(pathname):
     if pathname == "/":
         return [
-            # html.H1('General stuff', style={'textAlign': 'center'}),
             html.Div([
                 dcc.DatePickerSingle(date='2020-05-27',
                                      id="date-picker",
                                      display_format='MMM Do, YYYY'),
                 dcc.Slider(id="hour-slider",
-                           min=5,
-                           max=24,
+                           min=0,
+                           max=23,
                            step=None,
                            marks={
+                               0: "00:00",
+                               1: '01:00',
+                               2: '02:00',
+                               3: '03:00',
+                               4: '04:00',
                                5: '05:00',
                                6: '06:00',
                                7: '07:00',
@@ -92,7 +130,6 @@ def render_page_content(pathname):
                                21: '21:00',
                                22: '22:00',
                                23: '23:00',
-                               24: '24:00',
                            },
                            value=5,
                            className="slider"),
@@ -228,13 +265,45 @@ def render_page_content(pathname):
         ]
     elif pathname == "/stations":
         return [
-            html.H1('Stations', style={'textAlign': 'center'}),
-            # dcc.Graph(id='bargraph',
-            #           figure=px.bar(
-            #               df,
-            #               barmode='group',
-            #               x='Years',
-            #               y=['Girls High School', 'Boys High School']))
+            html.Div([
+                dcc.DatePickerSingle(date='2020-05-27',
+                                     id="date-picker",
+                                     display_format='MMM Do, YYYY'),
+                dcc.Slider(id="hour-slider",
+                           min=0,
+                           max=23,
+                           step=None,
+                           marks={
+                               0: "00:00",
+                               1: '01:00',
+                               2: '02:00',
+                               3: '03:00',
+                               4: '04:00',
+                               5: '05:00',
+                               6: '06:00',
+                               7: '07:00',
+                               8: '08:00',
+                               9: '09:00',
+                               10: '10:00',
+                               11: '11:00',
+                               12: '12:00',
+                               13: '13:00',
+                               14: '14:00',
+                               15: '15:00',
+                               16: '16:00',
+                               17: '17:00',
+                               18: '18:00',
+                               19: '19:00',
+                               20: '20:00',
+                               21: '21:00',
+                               22: '22:00',
+                               23: '23:00',
+                           },
+                           value=5,
+                           className="slider"),
+            ], ),
+            dcc.Graph(id='graph-with-slider-stations'),
+            dcc.Graph(id='graph-with-slider-capacity'),
         ]
     # If the user tries to reach a different page, return a 404 message
     return dbc.Jumbotron([
@@ -242,6 +311,84 @@ def render_page_content(pathname):
         html.Hr(),
         html.P(f"The pathname {pathname} was not recognised..."),
     ])
+
+
+#------------------------------------------------------------------------------------------------
+# FIGURE UPDATES
+#------------------------------------------------------------------------------------------------
+
+
+@app.callback(Output('graph-with-slider-stations', 'figure'),
+              Input('date-picker', 'date'))
+def update_figure_stations_lines(date):
+    filtered_df_by_time = df_events[df_events['Date_time'].str.contains(date)]
+
+    # y = filtered_df_by_time["Passengers_total"]
+    x = [
+        "00:00", "01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00",
+        "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00",
+        "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"
+    ]
+    fig = go.Figure()
+    for station in filtered_df_by_time["Station"]:
+        station_by_time = (
+            filtered_df_by_time[filtered_df_by_time["Station"] == station])
+        fig.add_trace(
+            go.Scatter(
+                x=x,
+                y=station_by_time["Passengers_total"],
+                marker=dict(size=6),
+                mode="lines+markers",
+                name=station,
+            ))
+    title = "Crowdness through {date} for each station".format(date=date)
+    fig.update_layout(title=title,
+                      xaxis_title="Hour",
+                      yaxis_title="Total Passengers")
+
+    return fig
+
+
+@app.callback(Output('graph-with-slider-capacity', 'figure'),
+              Input('hour-slider', 'value'), Input('date-picker', 'date'))
+def update_figure_stations_mobility(selected_hour, date):
+    if selected_hour == 24:
+        parsed_hour = "00"
+    elif selected_hour > 9:
+        parsed_hour = selected_hour
+    else:
+        parsed_hour = "0" + str(selected_hour)
+    filter = "{date} {selected_hour}:00:00".format(date=date,
+                                                   selected_hour=parsed_hour)
+    filtered_df_by_time = df_events[df_events["Date_time"] == filter]
+
+    x = filtered_df_by_time["Station"]
+
+    fig = go.Figure(
+        go.Bar(x=x,
+               y=filtered_df_by_time["Checked_in_passengers"],
+               name='Check in'))
+
+    fig.add_trace(
+        go.Bar(x=x,
+               y=filtered_df_by_time["Checked_out_passengers"],
+               name='Check out'))
+    fig.update_layout(barmode='stack')
+    fig.update_xaxes(categoryorder='category ascending')
+
+    fig.update_layout(transition_duration=500)
+    title = "Check in and check out for {date} at {selected_hour}:00 o'clock".format(
+        date=date, selected_hour=parsed_hour)
+    fig.update_layout(title=title,
+                      xaxis_title="Station",
+                      yaxis_title="Check-in & Check-out")
+
+    return fig
+
+
+#------------------------------------------------------------------------------------------------
+# IMAGE UPDATES
+#------------------------------------------------------------------------------------------------
 
 
 @app.callback(Output('Centraal', 'style'), Input('hour-slider', 'value'),
