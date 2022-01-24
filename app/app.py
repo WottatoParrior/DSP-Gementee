@@ -5,7 +5,7 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 import plotly.express as px
 import pandas as pd
-from helpers.helpers import create_filter_venues, create_filter_stations
+from helpers.helpers import create_filter_venues, create_filter_stations, create_hover_info
 import plotly.graph_objects as go
 
 # styling the sidebar
@@ -60,8 +60,9 @@ CONTENT_STYLE = {
 
 df_venues = pd.read_csv("../data/venues.csv")
 df_events = pd.read_csv("../data/events.csv")
+df_events_schedule = pd.read_csv("../data/events_to_display.csv")
 
-image_filename = "assets/MetroMap.svg"
+image_filename = "assets/metro.jpg"
 
 app = dash.Dash(__name__,
                 external_stylesheets=[
@@ -134,17 +135,52 @@ def render_page_content(pathname):
                            value=5,
                            className="slider"),
             ], ),
-            html.Div(className="container",
-                     children=[
-                         html.Img(src=image_filename, className="metro-svg"),
-                         html.Div(id="Centraal", className="station"),
-                         html.Div(id="Spaklerweg", className="station"),
-                         html.Div(id="VanDerMadeweg", className="station"),
-                         html.Div(id="Zuid", className="station"),
-                         html.Div(id="Bijlmer", className="station"),
-                         html.Div(id="Strandvliet", className="station"),
-                         html.Div(id="Duivendrecht", className="station"),
-                     ]),
+            html.Div(
+                className="container",
+                children=[
+                    html.Img(src=image_filename, className="metro-svg"),
+                    html.Div(id="Centraal-info", className="info-hover"),
+                    html.Div(id="Centraal", className="station"),
+                    #------------------------------------------#
+                    html.Div(id="Spaklerweg-info", className="info-hover"),
+                    html.Div(id="Spaklerweg", className="station"),
+                    #------------------------------------------#
+                    html.Div(id="VanDerMadeweg-info", className="info-hover"),
+                    html.Div(id="VanDerMadeweg", className="station"),
+                    #------------------------------------------#
+                    html.Div(id="Zuid-info", className="info-hover"),
+                    html.Div(id="Zuid", className="station"),
+                    #------------------------------------------#
+                    html.Div(id="Bijlmer-info", className="info-hover"),
+                    html.Div(id="Bijlmer", className="station"),
+                    #------------------------------------------#
+                    html.Div(id="Strandvliet-info", className="info-hover"),
+                    html.Div(id="Strandvliet", className="station"),
+                    #------------------------------------------#
+                    html.Div(id="Duivendrecht-info", className="info-hover"),
+                    html.Div(id="Duivendrecht", className="station"),
+                    #------------------------------------------#
+                    html.Div(id="NS-info", className="info-hover"),
+                    html.Div(id="NS", className="station"),
+                    #------------------------------------------#
+                    html.Div(id="NA-info", className="info-hover"),
+                    html.Div(id="NA", className="station"),
+                    #------------------------------------------#
+                    html.Div(id="VG-info", className="info-hover"),
+                    html.Div(id="VG", className="station"),
+                    #------------------------------------------#
+                    html.Div(id="BG-info", className="info-hover"),
+                    html.Div(id="BG", className="station"),
+                    #------------------------------------------#
+                    html.Div(id="IA-info", className="info-hover"),
+                    html.Div(id="IA", className="station"),
+                    #------------------------------------------#
+                    html.Div(id="RE-info", className="info-hover"),
+                    html.Div(id="RE", className="station"),
+                    #------------------------------------------#
+                    html.Div(id="RO-info", className="info-hover"),
+                    html.Div(id="RO", className="station"),
+                ]),
             html.Div(
                 className="venues-modal",
                 children=[
@@ -223,24 +259,22 @@ def render_page_content(pathname):
                     html.H2("Events",
                             className="head",
                             style={"padding": "0px 0px 10px 10px"}),
-                    html.Div(className="event-container",
-                             children=[
-                                 html.Div(className="event",
-                                          children=[
-                                              html.H2(
-                                                  "ArenA",
-                                                  className="venue-name",
-                                              ),
-                                              html.H2(
-                                                  id="noull",
-                                                  className="venue-numbers",
-                                              ),
-                                              html.H2(
-                                                  "/54900",
-                                                  className="venue-numbers",
-                                              ),
-                                          ]),
-                             ]),
+                    html.Div(className="event-container", id="events"),
+                ]),
+            html.Div(
+                className="color-helper",
+                children=[
+                    # html.Img(src=, className="metro-svg"),
+                    html.Div("No color", className="color-item"),
+                    html.Div("Less than regular crowdness",
+                             className="color-item"),
+                    html.Div(className="color-item green"),
+                    html.Div("0%-30% Increased crowdness",
+                             className="color-item"),
+                    html.Div(className="color-item"),
+                    html.Div(className="color-item"),
+                    html.Div(className="color-item"),
+                    html.Div(className="color-item"),
                 ])
             # dcc.Graph(id='bargraph',
             #           figure=px.bar(
@@ -390,6 +424,8 @@ def update_figure_stations_mobility(selected_hour, date):
 # IMAGE UPDATES
 #------------------------------------------------------------------------------------------------
 
+#-------------------------------------------------------------------------#
+
 
 @app.callback(Output('Centraal', 'style'), Input('hour-slider', 'value'),
               Input('date-picker', 'date'))
@@ -398,6 +434,14 @@ def update_style_Centraal(selected_hour, date):
                                   "Centraal Station")
 
 
+@app.callback(Output('Centraal-info', 'children'),
+              Input('hour-slider', 'value'), Input('date-picker', 'date'))
+def update_style_Centraal(selected_hour, date):
+    return create_hover_info(selected_hour, date, df_events,
+                             "Centraal Station")
+
+
+#-------------------------------------------------------------------------#
 @app.callback(Output('Strandvliet', 'style'), Input('hour-slider', 'value'),
               Input('date-picker', 'date'))
 def update_style_Strandvliet(selected_hour, date):
@@ -405,10 +449,28 @@ def update_style_Strandvliet(selected_hour, date):
                                   "Strandvliet")
 
 
+@app.callback(Output('Strandvliet-info', 'children'),
+              Input('hour-slider', 'value'), Input('date-picker', 'date'))
+def update_style_Strandvliet(selected_hour, date):
+    return create_hover_info(selected_hour, date, df_events, "Strandvliet")
+
+
+#-------------------------------------------------------------------------#
+
+
 @app.callback(Output('Spaklerweg', 'style'), Input('hour-slider', 'value'),
               Input('date-picker', 'date'))
 def update_style_Spaklerweg(selected_hour, date):
     return create_filter_stations(selected_hour, date, df_events, "Spaklerweg")
+
+
+@app.callback(Output('Spaklerweg-info', 'children'),
+              Input('hour-slider', 'value'), Input('date-picker', 'date'))
+def update_style_Spaklerweg(selected_hour, date):
+    return create_hover_info(selected_hour, date, df_events, "Spaklerweg")
+
+
+#-------------------------------------------------------------------------#
 
 
 @app.callback(Output('VanDerMadeweg', 'style'), Input('hour-slider', 'value'),
@@ -418,11 +480,29 @@ def update_style_VanDerMadeweg(selected_hour, date):
                                   "Van der Madeweg")
 
 
+@app.callback(Output('VanDerMadeweg-info', 'children'),
+              Input('hour-slider', 'value'), Input('date-picker', 'date'))
+def update_style_VanDerMadeweg(selected_hour, date):
+    return create_hover_info(selected_hour, date, df_events, "Van der Madeweg")
+
+
+#-------------------------------------------------------------------------#
+
+
 @app.callback(Output('Zuid', 'style'), Input('hour-slider', 'value'),
               Input('date-picker', 'date'))
 def update_style_Zuid(selected_hour, date):
     return create_filter_stations(selected_hour, date, df_events,
                                   "Station Zuid")
+
+
+@app.callback(Output('Zuid-info', 'children'), Input('hour-slider', 'value'),
+              Input('date-picker', 'date'))
+def update_style_Zuid(selected_hour, date):
+    return create_hover_info(selected_hour, date, df_events, "Station Zuid")
+
+
+#-------------------------------------------------------------------------#
 
 
 @app.callback(Output('Bijlmer', 'style'), Input('hour-slider', 'value'),
@@ -432,11 +512,151 @@ def update_style_Bijlmer(selected_hour, date):
                                   "Station Bijlmer ArenA")
 
 
+@app.callback(Output('Bijlmer-info', 'children'),
+              Input('hour-slider', 'value'), Input('date-picker', 'date'))
+def update_style_Bijlmer(selected_hour, date):
+    return create_hover_info(selected_hour, date, df_events,
+                             "Station Bijlmer ArenA")
+
+
+#-------------------------------------------------------------------------#
+
+
 @app.callback(Output('Duivendrecht', 'style'), Input('hour-slider', 'value'),
               Input('date-picker', 'date'))
 def update_style_Duivendrecht(selected_hour, date):
     return create_filter_stations(selected_hour, date, df_events,
                                   "Station Duivendrecht")
+
+
+@app.callback(Output('Duivendrecht-info', 'children'),
+              Input('hour-slider', 'value'), Input('date-picker', 'date'))
+def update_style_Duivendrecht(selected_hour, date):
+    return create_hover_info(selected_hour, date, df_events,
+                             "Station Duivendrecht")
+
+
+#-------------------------------------------------------------------------#
+
+
+@app.callback(Output('NS', 'style'), Input('hour-slider', 'value'),
+              Input('date-picker', 'date'))
+def update_style_NS(selected_hour, date):
+    return create_filter_stations(selected_hour, date, df_events,
+                                  "Joined Stations Line 52 North")
+
+
+@app.callback(Output('NS-info', 'children'), Input('hour-slider', 'value'),
+              Input('date-picker', 'date'))
+def update_style_NS(selected_hour, date):
+    return create_hover_info(selected_hour, date, df_events,
+                             "Joined Stations Line 52 North")
+
+
+#-------------------------------------------------------------------------#
+
+
+@app.callback(Output('RE', 'style'), Input('hour-slider', 'value'),
+              Input('date-picker', 'date'))
+def update_style_RE(selected_hour, date):
+    return create_filter_stations(selected_hour, date, df_events,
+                                  "Joined Stations Line 52 South")
+
+
+@app.callback(Output('RE-info', 'children'), Input('hour-slider', 'value'),
+              Input('date-picker', 'date'))
+def update_style_RE(selected_hour, date):
+    return create_hover_info(selected_hour, date, df_events,
+                             "Joined Stations Line 52 South")
+
+
+#-------------------------------------------------------------------------#
+
+
+@app.callback(Output('NA', 'style'), Input('hour-slider', 'value'),
+              Input('date-picker', 'date'))
+def update_style_NA(selected_hour, date):
+    return create_filter_stations(selected_hour, date, df_events,
+                                  "Joined Stations Line 51,53,54")
+
+
+@app.callback(Output('NA-info', 'children'), Input('hour-slider', 'value'),
+              Input('date-picker', 'date'))
+def update_style_NA(selected_hour, date):
+    return create_hover_info(selected_hour, date, df_events,
+                             "Joined Stations Line 51,53,54")
+
+
+#-------------------------------------------------------------------------#
+
+
+@app.callback(Output('VG', 'style'), Input('hour-slider', 'value'),
+              Input('date-picker', 'date'))
+def update_style_VG(selected_hour, date):
+    return create_filter_stations(selected_hour, date, df_events,
+                                  "Joined Stations Line 52 South")
+
+
+@app.callback(Output('VG-info', 'children'), Input('hour-slider', 'value'),
+              Input('date-picker', 'date'))
+def update_style_VG(selected_hour, date):
+    return create_hover_info(selected_hour, date, df_events,
+                             "Joined Stations Line 52 South")
+
+
+#-------------------------------------------------------------------------#
+
+
+@app.callback(Output('BG', 'style'), Input('hour-slider', 'value'),
+              Input('date-picker', 'date'))
+def update_style_BG(selected_hour, date):
+    return create_filter_stations(selected_hour, date, df_events,
+                                  "Joined Stations Line 50,54 South")
+
+
+@app.callback(Output('BG-info', 'children'), Input('hour-slider', 'value'),
+              Input('date-picker', 'date'))
+def update_style_BG(selected_hour, date):
+    return create_hover_info(selected_hour, date, df_events,
+                             "Joined Stations Line 50,54 South")
+
+
+#-------------------------------------------------------------------------#
+
+
+@app.callback(Output('IA', 'style'), Input('hour-slider', 'value'),
+              Input('date-picker', 'date'))
+def update_style_IA(selected_hour, date):
+    return create_filter_stations(selected_hour, date, df_events,
+                                  "Joined Stations Line 50,51")
+
+
+@app.callback(Output('IA-info', 'children'), Input('hour-slider', 'value'),
+              Input('date-picker', 'date'))
+def update_style_IA(selected_hour, date):
+    return create_hover_info(selected_hour, date, df_events,
+                             "Joined Stations Line 50,51")
+
+
+#-------------------------------------------------------------------------#
+
+
+@app.callback(Output('RO', 'style'), Input('hour-slider', 'value'),
+              Input('date-picker', 'date'))
+def update_style_RO(selected_hour, date):
+    return create_filter_stations(selected_hour, date, df_events,
+                                  "Station RAI")
+
+
+@app.callback(Output('RO-info', 'children'), Input('hour-slider', 'value'),
+              Input('date-picker', 'date'))
+def update_style_RO(selected_hour, date):
+    return create_hover_info(selected_hour, date, df_events, "Station RAI")
+
+
+#------------------------------------------------------------------------------------------------
+# VENUES UPDATES
+#------------------------------------------------------------------------------------------------
 
 
 @app.callback(Output('arena', 'children'), Input('hour-slider', 'value'),
@@ -470,6 +690,38 @@ def update_venue(selected_hour, date):
     filtered_df = df_venues[df_venues["Time_to_filter"] == filter]
     return filtered_df["At_Ziggo_beginning_of_hour"]
 
+
+#------------------------------------------------------------------------------------------------
+# EVENT UPDATES
+#------------------------------------------------------------------------------------------------
+
+# @app.callback(Output('events', 'children'), Input('date-picker', 'date'))
+# def return_recent_events(date):
+
+# today_events = df_events[df_events["Date_time"].str.contains(date)
+#                          & df_events["Event starting"] == 1]
+# yesterday_events = df_events.loc[df_events["Date_time"].str.contains(
+#     "2020-05-27").shift(-24 * 15) == 1]
+# tomorrow_events = df_events.loc[df_events["Date_time"].str.contains(
+#     "2020-05-27").shift(24 * 15) == 1]
+
+# yesterday_events = yesterday_events[yesterday_events["Event starting"] ==
+#                                     1]
+# tomorrow_events = tomorrow_events[tomorrow_events["Event starting"] == 1]
+
+# if(yesterday_events.empty):
+
+# return (html.Div(className="event",
+#                  children=[
+#                      html.H2(
+#                          date,
+#                          className="venue-name",
+#                      ),
+#                      html.H2(
+#                          "Today",
+#                          className="venue-numbers",
+#                      ),
+#                  ]))
 
 if __name__ == '__main__':
 

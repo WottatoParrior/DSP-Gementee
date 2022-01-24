@@ -15,18 +15,28 @@
 .nav-link:hover {
   color: black;
 }
-
+.color-helper {
+  position: absolute;
+  width: 304px;
+  height: 198px;
+  top: 21%;
+  border: 2px solid black;
+  z-index: 20;
+  left: 51%;
+  border-radius: 3px;
+}
 .metro-svg {
-  width: 100%;
-  height: 758px;
-  margin-left: -32%;
-  margin-top: -87px;
+  width: 42.9%;
+  height: 644px;
+  margin-top: -6px;
 }
 .container {
   position: relative;
-  z-index: -2;
+  z-index: 1;
 }
-
+.SingleDatePicker_picker {
+  z-index: 2;
+}
 .slider {
   padding-top: 20px !important;
 }
@@ -98,6 +108,37 @@
   font-weight: 700;
 }
 
+.hide {
+  display: none;
+}
+.info-hover:hover + .hide {
+  display: block;
+}
+
+.info-hover {
+  width: 37px;
+  height: 37px;
+  cursor: pointer;
+  animation: none;
+}
+
+.info-hover-Centraal-Station {
+  width: 37px;
+  height: 37px;
+  cursor: pointer;
+}
+
+.info-hover-text {
+  font-size: 19px;
+}
+
+.hover-container {
+  width: 200px;
+  padding: 5px 10px;
+  background: gainsboro;
+  border-radius: 4px;
+}
+
 .station {
   width: 37px;
   height: 37px;
@@ -110,43 +151,171 @@
   animation-iteration-count: infinite;
   animation-direction: alternate;
 }
+
 #VanDerMadeweg {
   position: absolute;
-  left: 18.4%;
-  bottom: 46%;
+  left: 23%;
+  bottom: 33%;
+}
+
+#VanDerMadeweg-info {
+  position: absolute;
+  left: 23%;
+  bottom: 33%;
+  z-index: 10;
 }
 #Centraal {
   position: absolute;
-  left: 16.2%;
-  bottom: 85.3%;
+  left: 20.5%;
+  bottom: 80.3%;
+  width: 37px;
+  height: 37px;
+}
+
+#Centraal-info {
+  position: absolute;
+  left: 20.5%;
+  bottom: 80.3%;
+  z-index: 10;
 }
 #Spaklerweg {
   position: absolute;
-  left: 18.6%;
-  bottom: 54.8%;
+  left: 23%;
+  bottom: 44.8%;
+}
+#Spaklerweg-info {
+  position: absolute;
+  left: 23%;
+  bottom: 44.8%;
+  z-index: 10;
 }
 #Zuid {
   position: absolute;
-  left: 5.2%;
-  bottom: 51%;
+  left: 9.9%;
+  bottom: 40%;
 }
-
+#Zuid-info {
+  position: absolute;
+  left: 9.9%;
+  bottom: 40%;
+  z-index: 10;
+}
 #Bijlmer {
   position: absolute;
-  left: 18.2%;
-  bottom: 26.4%;
+  left: 22.6%;
+  bottom: 12.4%;
 }
-
+#Bijlmer-info {
+  position: absolute;
+  left: 22.6%;
+  bottom: 12.4%;
+  z-index: 10;
+}
 #Strandvliet {
   position: absolute;
-  left: 18.2%;
-  bottom: 32.7%;
+  left: 22.6%;
+  bottom: 19.3%;
 }
-
+#Strandvliet-info {
+  position: absolute;
+  left: 22.6%;
+  bottom: 19.3%;
+  z-index: 10;
+}
 #Duivendrecht {
   position: absolute;
-  left: 18%;
+  left: 22.6%;
+  bottom: 26%;
+}
+#Duivendrecht-info {
+  position: absolute;
+  left: 22.6%;
+  bottom: 26%;
+  z-index: 10;
+}
+
+#NS {
+  position: absolute;
+  left: 24%;
+  bottom: 87%;
+}
+#NS-info {
+  position: absolute;
+  left: 24%;
+  bottom: 87%;
+  z-index: 10;
+}
+
+#NA {
+  position: absolute;
+  left: 23%;
+  bottom: 60%;
+}
+#NA-info {
+  position: absolute;
+  left: 23%;
+  bottom: 60%;
+  z-index: 10;
+}
+
+#VG {
+  position: absolute;
+  left: 28%;
+  bottom: 27%;
+}
+#VG-info {
+  position: absolute;
+  left: 28%;
+  bottom: 27%;
+  z-index: 10;
+}
+
+#BG {
+  position: absolute;
+  left: 22.6%;
+  bottom: 5%;
+}
+#BG-info {
+  position: absolute;
+  left: 22.6%;
+  bottom: 5%;
+  z-index: 10;
+}
+
+#IA {
+  position: absolute;
+  left: 3.6%;
+  bottom: 40%;
+}
+#IA-info {
+  position: absolute;
+  left: 3.6%;
+  bottom: 40%;
+  z-index: 10;
+}
+
+#RE {
+  position: absolute;
+  left: 14.1%;
+  bottom: 63%;
+}
+#RE-info {
+  position: absolute;
+  left: 14.1%;
+  bottom: 63%;
+  z-index: 10;
+}
+
+#RO {
+  position: absolute;
+  left: 17.6%;
   bottom: 39%;
+}
+#RO-info {
+  position: absolute;
+  left: 17.6%;
+  bottom: 39%;
+  z-index: 10;
 }
 @keyframes pulse {
   from {
