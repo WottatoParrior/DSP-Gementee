@@ -44,3 +44,9 @@ source .venv/bin/activate # linux
 .\.venv/scripts/activate # windows
 
 pip install -r requirements.txt
+
+
+# Data
+
+Get the files from here https://drive.google.com/drive/folders/1mwwK_WFrNAWq9Cu2q02kQF_RuvnJtF6x
+and add them in DSP-Gementee/data
