@@ -20,10 +20,42 @@
   width: 304px;
   height: 198px;
   top: 21%;
-  border: 2px solid black;
   z-index: 20;
-  left: 51%;
+  left: 56%;
   border-radius: 3px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  border-left: 2px solid;
+  padding-left: 5px;
+}
+
+.color-item {
+  width: 78%;
+}
+
+.no-color {
+  width: 38px;
+  height: 15%;
+  border-radius: 100%;
+}
+.green {
+  width: 38px;
+  height: 15%;
+  border-radius: 100%;
+  background-color: green;
+}
+.orange {
+  width: 38px;
+  height: 15%;
+  border-radius: 100%;
+  background-color: orange;
+}
+.red {
+  width: 38px;
+  height: 15%;
+  border-radius: 100%;
+  background-color: red;
 }
 .metro-svg {
   width: 42.9%;
@@ -49,7 +81,7 @@
   background-color: #e8e2e2;
   position: absolute;
   top: 21%;
-  left: 70%;
+  left: 74%;
   padding: 15px;
   overflow: auto;
   border-radius: 4px;
@@ -60,7 +92,7 @@
   background-color: #e8e2e2;
   position: absolute;
   top: 64%;
-  left: 70%;
+  left: 74%;
   padding: 15px;
   overflow: auto;
   border-radius: 4px;
@@ -133,10 +165,12 @@
 }
 
 .hover-container {
-  width: 200px;
+  width: 300px;
   padding: 5px 10px;
   background: gainsboro;
   border-radius: 4px;
+  position: relative;
+  z-index: 100;
 }
 
 .station {

@@ -5,8 +5,10 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 import plotly.express as px
 import pandas as pd
+from datetime import date
 from helpers.helpers import create_filter_venues, create_filter_stations, create_hover_info
 import plotly.graph_objects as go
+import dash_table
 
 # styling the sidebar
 SIDEBAR_STYLE = {
@@ -61,6 +63,7 @@ CONTENT_STYLE = {
 df_venues = pd.read_csv("../data/venues.csv")
 df_events = pd.read_csv("../data/events.csv")
 df_events_schedule = pd.read_csv("../data/events_to_display.csv")
+df_predictions = pd.read_csv("../data/predictions.csv")
 
 image_filename = "assets/metro.jpg"
 
@@ -99,8 +102,10 @@ def render_page_content(pathname):
     if pathname == "/":
         return [
             html.Div([
-                dcc.DatePickerSingle(date='2020-05-27',
+                dcc.DatePickerSingle(date='2021-10-23',
                                      id="date-picker",
+                                     min_date_allowed=date(2020, 1, 1),
+                                     max_date_allowed=date(2021, 11, 21),
                                      display_format='MMM Do, YYYY'),
                 dcc.Slider(id="hour-slider",
                            min=0,
@@ -265,16 +270,23 @@ def render_page_content(pathname):
                 className="color-helper",
                 children=[
                     # html.Img(src=, className="metro-svg"),
-                    html.Div("No color", className="color-item"),
-                    html.Div("Less than regular crowdness",
+                    html.Div("Color Codes",
+                             style={
+                                 "width": "100%",
+                                 "font-weight": "900"
+                             }),
+                    html.Div("None", className="color-item no-color"),
+                    html.Div("- Less than regular crowdness",
                              className="color-item"),
                     html.Div(className="color-item green"),
-                    html.Div("0%-30% Increased crowdness",
+                    html.Div("- 0%-30% Increased crowdness",
                              className="color-item"),
-                    html.Div(className="color-item"),
-                    html.Div(className="color-item"),
-                    html.Div(className="color-item"),
-                    html.Div(className="color-item"),
+                    html.Div(className="color-item orange"),
+                    html.Div("- 31%-60% Increased crowdness",
+                             className="color-item"),
+                    html.Div(className="color-item red"),
+                    html.Div("- 60%+ Increased crowdness",
+                             className="color-item"),
                 ])
             # dcc.Graph(id='bargraph',
             #           figure=px.bar(
@@ -285,7 +297,105 @@ def render_page_content(pathname):
         ]
     elif pathname == "/venues":
         return [
-            html.H1('Venues or smth', style={'textAlign': 'center'}),
+            html.H1('Insights about venues', style={'textAlign': 'center'}),
+            html.Div([
+                dcc.DatePickerSingle(date='2021-10-23',
+                                     id="date-picker",
+                                     min_date_allowed=date(2020, 1, 1),
+                                     max_date_allowed=date(2021, 11, 21),
+                                     display_format='MMM Do, YYYY'),
+                dcc.Slider(id="hour-slider",
+                           min=0,
+                           max=23,
+                           step=None,
+                           marks={
+                               0: "00:00",
+                               1: '01:00',
+                               2: '02:00',
+                               3: '03:00',
+                               4: '04:00',
+                               5: '05:00',
+                               6: '06:00',
+                               7: '07:00',
+                               8: '08:00',
+                               9: '09:00',
+                               10: '10:00',
+                               11: '11:00',
+                               12: '12:00',
+                               13: '13:00',
+                               14: '14:00',
+                               15: '15:00',
+                               16: '16:00',
+                               17: '17:00',
+                               18: '18:00',
+                               19: '19:00',
+                               20: '20:00',
+                               21: '21:00',
+                               22: '22:00',
+                               23: '23:00',
+                           },
+                           value=5,
+                           className="slider"),
+            ], ),
+            dcc.Graph(id='venues-graph', style={'display': 'inline-block'}),
+            dcc.Graph(id='venues-graph2', style={'display': 'inline-block'}),
+            html.Div([
+                html.H4(children='List of events'),
+                #dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True)
+                dash_table.DataTable(
+                    id='table-filter',
+                    data=df_events_schedule.to_dict('records'),
+                    columns=[
+                        {
+                            'id': 'ID',
+                            'name': 'ID'
+                        },
+                        {
+                            'id': 'Date',
+                            'name': 'Date'
+                        },
+                        {
+                            'id': 'Titel',
+                            'name': 'Titel'
+                        },
+                        {
+                            'id': 'Starting time',
+                            'name': 'Starting time'
+                        },
+                        {
+                            'id': 'Opening time',
+                            'name': 'Opening time'
+                        },
+                        {
+                            'id': 'Ending time',
+                            'name': 'Ending time'
+                        },
+                        {
+                            'id': 'Location',
+                            'name': 'Location'
+                        },
+                        {
+                            'id': 'Expected visitors',
+                            'name': 'Expected visitors'
+                        },
+                        {
+                            'id': 'Capacity of location',
+                            'name': 'Capacity of location'
+                        },
+                        {
+                            'id': '%',
+                            'name': 'Expected location saturation'
+                        },
+                    ],
+                    style_as_list_view=True,
+                    style_cell={'padding': '5px'},
+                    style_header={
+                        'backgroundColor': 'white',
+                        'fontWeight': 'bold',
+                        'font-family': 'sans-serif'
+                    },
+                    style_data={'font-family': 'sans-serif'})
+            ])
         ]
     elif pathname == "/events":
         return [
@@ -296,11 +406,18 @@ def render_page_content(pathname):
             #               barmode='group',
             #               x='Years',
             #               y=['Girls High School', 'Boys High School']))
+            html.Div([
+                html.H4(children=''),
+                dbc.Table.from_dataframe(df_events_schedule,
+                                         striped=True,
+                                         bordered=True,
+                                         hover=True)
+            ])
         ]
     elif pathname == "/stations":
         return [
             html.Div([
-                dcc.DatePickerSingle(date='2020-05-27',
+                dcc.DatePickerSingle(date='2021-10-23',
                                      id="date-picker",
                                      display_format='MMM Do, YYYY'),
                 dcc.Slider(id="hour-slider",
@@ -438,7 +555,7 @@ def update_style_Centraal(selected_hour, date):
               Input('hour-slider', 'value'), Input('date-picker', 'date'))
 def update_style_Centraal(selected_hour, date):
     return create_hover_info(selected_hour, date, df_events,
-                             "Centraal Station")
+                             "Centraal Station", df_predictions)
 
 
 #-------------------------------------------------------------------------#
@@ -452,7 +569,8 @@ def update_style_Strandvliet(selected_hour, date):
 @app.callback(Output('Strandvliet-info', 'children'),
               Input('hour-slider', 'value'), Input('date-picker', 'date'))
 def update_style_Strandvliet(selected_hour, date):
-    return create_hover_info(selected_hour, date, df_events, "Strandvliet")
+    return create_hover_info(selected_hour, date, df_events, "Strandvliet",
+                             df_predictions)
 
 
 #-------------------------------------------------------------------------#
@@ -467,7 +585,8 @@ def update_style_Spaklerweg(selected_hour, date):
 @app.callback(Output('Spaklerweg-info', 'children'),
               Input('hour-slider', 'value'), Input('date-picker', 'date'))
 def update_style_Spaklerweg(selected_hour, date):
-    return create_hover_info(selected_hour, date, df_events, "Spaklerweg")
+    return create_hover_info(selected_hour, date, df_events, "Spaklerweg",
+                             df_predictions)
 
 
 #-------------------------------------------------------------------------#
@@ -483,7 +602,8 @@ def update_style_VanDerMadeweg(selected_hour, date):
 @app.callback(Output('VanDerMadeweg-info', 'children'),
               Input('hour-slider', 'value'), Input('date-picker', 'date'))
 def update_style_VanDerMadeweg(selected_hour, date):
-    return create_hover_info(selected_hour, date, df_events, "Van der Madeweg")
+    return create_hover_info(selected_hour, date, df_events, "Van der Madeweg",
+                             df_predictions)
 
 
 #-------------------------------------------------------------------------#
@@ -499,7 +619,8 @@ def update_style_Zuid(selected_hour, date):
 @app.callback(Output('Zuid-info', 'children'), Input('hour-slider', 'value'),
               Input('date-picker', 'date'))
 def update_style_Zuid(selected_hour, date):
-    return create_hover_info(selected_hour, date, df_events, "Station Zuid")
+    return create_hover_info(selected_hour, date, df_events, "Station Zuid",
+                             df_predictions)
 
 
 #-------------------------------------------------------------------------#
@@ -516,7 +637,7 @@ def update_style_Bijlmer(selected_hour, date):
               Input('hour-slider', 'value'), Input('date-picker', 'date'))
 def update_style_Bijlmer(selected_hour, date):
     return create_hover_info(selected_hour, date, df_events,
-                             "Station Bijlmer ArenA")
+                             "Station Bijlmer ArenA", df_predictions)
 
 
 #-------------------------------------------------------------------------#
@@ -533,7 +654,7 @@ def update_style_Duivendrecht(selected_hour, date):
               Input('hour-slider', 'value'), Input('date-picker', 'date'))
 def update_style_Duivendrecht(selected_hour, date):
     return create_hover_info(selected_hour, date, df_events,
-                             "Station Duivendrecht")
+                             "Station Duivendrecht", df_predictions)
 
 
 #-------------------------------------------------------------------------#
@@ -550,7 +671,7 @@ def update_style_NS(selected_hour, date):
               Input('date-picker', 'date'))
 def update_style_NS(selected_hour, date):
     return create_hover_info(selected_hour, date, df_events,
-                             "Joined Stations Line 52 North")
+                             "Joined Stations Line 52 North", df_predictions)
 
 
 #-------------------------------------------------------------------------#
@@ -567,7 +688,7 @@ def update_style_RE(selected_hour, date):
               Input('date-picker', 'date'))
 def update_style_RE(selected_hour, date):
     return create_hover_info(selected_hour, date, df_events,
-                             "Joined Stations Line 52 South")
+                             "Joined Stations Line 52 South", df_predictions)
 
 
 #-------------------------------------------------------------------------#
@@ -584,7 +705,7 @@ def update_style_NA(selected_hour, date):
               Input('date-picker', 'date'))
 def update_style_NA(selected_hour, date):
     return create_hover_info(selected_hour, date, df_events,
-                             "Joined Stations Line 51,53,54")
+                             "Joined Stations Line 51,53,54", df_predictions)
 
 
 #-------------------------------------------------------------------------#
@@ -601,7 +722,7 @@ def update_style_VG(selected_hour, date):
               Input('date-picker', 'date'))
 def update_style_VG(selected_hour, date):
     return create_hover_info(selected_hour, date, df_events,
-                             "Joined Stations Line 52 South")
+                             "Joined Stations Line 52 South", df_predictions)
 
 
 #-------------------------------------------------------------------------#
@@ -618,7 +739,8 @@ def update_style_BG(selected_hour, date):
               Input('date-picker', 'date'))
 def update_style_BG(selected_hour, date):
     return create_hover_info(selected_hour, date, df_events,
-                             "Joined Stations Line 50,54 South")
+                             "Joined Stations Line 50,54 South",
+                             df_predictions)
 
 
 #-------------------------------------------------------------------------#
@@ -635,7 +757,7 @@ def update_style_IA(selected_hour, date):
               Input('date-picker', 'date'))
 def update_style_IA(selected_hour, date):
     return create_hover_info(selected_hour, date, df_events,
-                             "Joined Stations Line 50,51")
+                             "Joined Stations Line 50,51", df_predictions)
 
 
 #-------------------------------------------------------------------------#
@@ -651,7 +773,8 @@ def update_style_RO(selected_hour, date):
 @app.callback(Output('RO-info', 'children'), Input('hour-slider', 'value'),
               Input('date-picker', 'date'))
 def update_style_RO(selected_hour, date):
-    return create_hover_info(selected_hour, date, df_events, "Station RAI")
+    return create_hover_info(selected_hour, date, df_events, "Station RAI",
+                             df_predictions)
 
 
 #------------------------------------------------------------------------------------------------
@@ -722,6 +845,101 @@ def update_venue(selected_hour, date):
 #                          className="venue-numbers",
 #                      ),
 #                  ]))
+
+#------------------------------------------------------------------------------------------------
+# VENUES TAB
+#------------------------------------------------------------------------------------------------
+
+
+@app.callback(Output('venues-graph', 'figure'), Input('hour-slider', 'value'),
+              Input('date-picker', 'date'))
+def update_figure_stations_mobility(selected_hour, date):
+    if selected_hour == 24:
+        parsed_hour = "00"
+    elif selected_hour > 9:
+        parsed_hour = selected_hour
+    else:
+        parsed_hour = "0" + str(selected_hour)
+    filter = "{date} {selected_hour}:00:00".format(date=date,
+                                                   selected_hour=parsed_hour)
+    filtered_df_by_time = df_venues[df_venues["Time_to_filter"] == filter]
+
+    at_arena = int(filtered_df_by_time["At_ArenA_end_of_hour"])
+    at_afas = int(filtered_df_by_time["At_AFAS_end_of_hour"])
+    at_zigo = int(filtered_df_by_time["At_Ziggo_end_of_hour"])
+    at_detoekomst = int(filtered_df_by_time["At_De_Toekmost_end_of_hour"])
+
+    venues = ['ArenA', 'AFAS', 'Ziggo', 'DeToekmost']
+
+    fig = go.Figure(
+        [go.Bar(x=venues, y=[at_arena, at_afas, at_zigo, at_detoekomst])])
+
+    title = "Visitors at venues on {date} at {selected_hour}:00 o'clock".format(
+        date=date, selected_hour=parsed_hour)
+
+    fig.update_layout(title=title,
+                      yaxis_range=[0, 55000],
+                      xaxis_title="Venues",
+                      yaxis_title="Visitors",
+                      width=600,
+                      height=400)
+
+    fig.add_layout_image(
+        dict(
+            source=
+            "https://raw.githubusercontent.com/michaelbabyn/plot_data/master/naphthalene.png",
+            x=0.9,
+            y=0.3,
+        ))
+
+    return fig
+
+
+@app.callback(Output('venues-graph2', 'figure'), Input('hour-slider', 'value'),
+              Input('date-picker', 'date'))
+def update_figure_stations_mobility2(selected_hour, date):
+    if selected_hour == 24:
+        parsed_hour = "00"
+    elif selected_hour > 9:
+        parsed_hour = selected_hour
+    else:
+        parsed_hour = "0" + str(selected_hour)
+    filter = "{date} {selected_hour}:00:00".format(date=date,
+                                                   selected_hour=parsed_hour)
+    filtered_df_by_time = df_events[(df_events["Date_time"] == filter) & (
+        df_events["Station"] == "Station Bijlmer ArenA")]
+
+    check_in = int(filtered_df_by_time["Checked_in_passengers"])
+    #check_in_baseline = int(filtered_df_by_time["Checked_in_passengers_BASELINE"])
+    check_out = int(filtered_df_by_time["Checked_out_passengers"])
+    #check_out_baseline = int(filtered_df_by_time["Checked_out_passengers_BASELINE"])
+
+    labels = ['Checked in', 'Checked out']
+
+    fig = go.Figure([go.Bar(x=labels, y=[check_in, check_out])])
+
+    title = "Passengers at Bijlmer ArenA station"
+    fig.update_layout(title=title,
+                      yaxis_range=[0, 2500],
+                      xaxis_title="Travel way",
+                      yaxis_title="Passengers",
+                      width=400,
+                      height=400,
+                      bargap=0.3)
+
+    return fig
+
+
+#------------------------------------------------------------------------------------------------
+# EVENTS TAB
+#------------------------------------------------------------------------------------------------
+
+
+@app.callback(Output('table-filter', 'data'), Input('date-picker', 'date'))
+def update_table(date):
+    return df_events_schedule[df_events_schedule["Date"] == date].to_dict(
+        'records')
+
 
 if __name__ == '__main__':
 
