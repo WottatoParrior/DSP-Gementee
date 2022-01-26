@@ -463,7 +463,7 @@ def update_figure_stations_lines(date):
 
 
 @app.callback(Output('graph-with-slider-capacity', 'figure'),
-              Input('hour-slider', 'value'), Input('date-picker', 'date'))
+              Input('date-picker', 'date'), Input('hour-slider', 'value'))
 def update_figure_stations_mobility(selected_hour, date):
     if selected_hour == 24:
         parsed_hour = "00"
@@ -477,26 +477,24 @@ def update_figure_stations_mobility(selected_hour, date):
 
     x = filtered_df_by_time["Station"]
 
-    fig = go.Figure(
+    fig1 = go.Figure(
         go.Bar(x=x,
                y=filtered_df_by_time["Checked_in_passengers"],
                name='Check in'))
 
-    fig.add_trace(
+    fig1.add_trace(
         go.Bar(x=x,
                y=filtered_df_by_time["Checked_out_passengers"],
                name='Check out'))
-    fig.update_layout(barmode='stack')
-    fig.update_xaxes(categoryorder='category ascending')
+    fig1.update_xaxes(categoryorder='category ascending')
 
-    fig.update_layout(transition_duration=500)
-    title = "Check in and check out for {date} at {selected_hour}:00 o'clock".format(
-        date=date, selected_hour=parsed_hour)
-    fig.update_layout(title=title,
-                      xaxis_title="Station",
-                      yaxis_title="Check-in & Check-out")
+    title = "Check in and check out".format(filter=filter)
+    fig1.update_layout(title=title,
+                       xaxis_title="Station",
+                       yaxis_title="Check-in & Check-out",
+                       barmode='stack')
 
-    return fig
+    return fig1
 
 
 #------------------------------------------------------------------------------------------------
