@@ -3,7 +3,6 @@ from dash import dcc, html
 import dash_bootstrap_components as dbc
 import dash_html_components as html
 from dash.dependencies import Input, Output
-import plotly.express as px
 import pandas as pd
 from datetime import date
 from helpers.helpers import create_filter_venues, create_filter_stations, create_hover_info
@@ -28,38 +27,6 @@ CONTENT_STYLE = {
     "padding": "2rem 1rem",
 }
 
-# stations_capacity = [
-#     50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750,
-#     800, 850
-# ]
-# stations_capacity_figure = go.Figure()
-
-# stations_capacity_figure.add_trace(
-#     go.Scatter(
-#         x=[72, 67, 73, 80, 76, 79, 84, 78, 86, 93, 94, 90, 92, 96, 94, 112],
-#         y=stations_capacity,
-#         marker=dict(color="crimson", size=12),
-#         mode="markers",
-#         name="Women",
-#     ))
-
-# stations_capacity_figure.add_trace(
-#     go.Scatter(
-#         x=[
-#             92, 94, 100, 107, 112, 114, 114, 118, 119, 124, 131, 137, 141, 151,
-#             152, 165
-#         ],
-#         y=stations_capacity,
-#         marker=dict(color="gold", size=12),
-#         mode="markers",
-#         name="Men",
-#     ))
-
-# stations_capacity_figure.update_layout(
-#     title="Gender Earnings Disparity",
-#     xaxis_title="Annual Salary (in thousands)",
-#     yaxis_title="School")
-
 df_venues = pd.read_csv("../data/venues.csv")
 df_events = pd.read_csv("../data/events.csv")
 df_events_schedule = pd.read_csv("../data/events_to_display.csv")
@@ -72,6 +39,7 @@ app = dash.Dash(__name__,
                     dbc.themes.BOOTSTRAP,
                 ],
                 suppress_callback_exceptions=True)
+app.title = 'Mobility Management'
 
 app.layout = html.Div([
     dcc.Location(id="url"),
@@ -288,12 +256,6 @@ def render_page_content(pathname):
                     html.Div("- 60%+ Increased crowdness",
                              className="color-item"),
                 ])
-            # dcc.Graph(id='bargraph',
-            #           figure=px.bar(
-            #               df,
-            #               barmode='group',
-            #               x='Years',
-            #               y=['Girls Kindergarten', 'Boys Kindergarten']))
         ]
     elif pathname == "/venues":
         return [
@@ -456,7 +418,6 @@ def render_page_content(pathname):
             dcc.Graph(id='graph-with-slider-stations'),
             dcc.Graph(id='graph-with-slider-capacity'),
         ]
-    # If the user tries to reach a different page, return a 404 message
     return dbc.Jumbotron([
         html.H1("404: Not found", className="text-danger"),
         html.Hr(),
@@ -495,7 +456,8 @@ def update_figure_stations_lines(date):
     title = "Crowdness through {date} for each station".format(date=date)
     fig.update_layout(title=title,
                       xaxis_title="Hour",
-                      yaxis_title="Total Passengers")
+                      yaxis_title="Total Passengers",
+                      showlegend=False)
 
     return fig
 
@@ -687,6 +649,7 @@ def update_style_RE(selected_hour, date):
 @app.callback(Output('RE-info', 'children'), Input('hour-slider', 'value'),
               Input('date-picker', 'date'))
 def update_style_RE(selected_hour, date):
+
     return create_hover_info(selected_hour, date, df_events,
                              "Joined Stations Line 52 South", df_predictions)
 
@@ -818,33 +781,25 @@ def update_venue(selected_hour, date):
 # EVENT UPDATES
 #------------------------------------------------------------------------------------------------
 
-# @app.callback(Output('events', 'children'), Input('date-picker', 'date'))
-# def return_recent_events(date):
 
-# today_events = df_events[df_events["Date_time"].str.contains(date)
-#                          & df_events["Event starting"] == 1]
-# yesterday_events = df_events.loc[df_events["Date_time"].str.contains(
-#     "2020-05-27").shift(-24 * 15) == 1]
-# tomorrow_events = df_events.loc[df_events["Date_time"].str.contains(
-#     "2020-05-27").shift(24 * 15) == 1]
+@app.callback(Output('events', 'children'), Input('date-picker', 'date'))
+def return_recent_events(date):
 
-# yesterday_events = yesterday_events[yesterday_events["Event starting"] ==
-#                                     1]
-# tomorrow_events = tomorrow_events[tomorrow_events["Event starting"] == 1]
+    today_events = df_events_schedule[df_events_schedule["Date"].str.contains(
+        date)]
+    for i in range(1, 3):
+        return (html.Div(className="event",
+                         children=[
+                             html.H2(
+                                 date,
+                                 className="venue-name",
+                             ),
+                             html.H2(
+                                 "Today",
+                                 className="venue-numbers",
+                             ),
+                         ]))
 
-# if(yesterday_events.empty):
-
-# return (html.Div(className="event",
-#                  children=[
-#                      html.H2(
-#                          date,
-#                          className="venue-name",
-#                      ),
-#                      html.H2(
-#                          "Today",
-#                          className="venue-numbers",
-#                      ),
-#                  ]))
 
 #------------------------------------------------------------------------------------------------
 # VENUES TAB
