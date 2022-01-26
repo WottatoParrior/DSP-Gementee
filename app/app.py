@@ -784,21 +784,39 @@ def update_venue(selected_hour, date):
 
 @app.callback(Output('events', 'children'), Input('date-picker', 'date'))
 def return_recent_events(date):
-
     today_events = df_events_schedule[df_events_schedule["Date"].str.contains(
         date)]
-    for i in range(1, 3):
-        return (html.Div(className="event",
-                         children=[
-                             html.H2(
-                                 date,
-                                 className="venue-name",
-                             ),
-                             html.H2(
-                                 "Today",
-                                 className="venue-numbers",
-                             ),
-                         ]))
+    event_names = today_events["Titel"].values
+    event_time = today_events["Starting time"].values
+    event_location = today_events["Location"].values
+    event_visitors = today_events["Expected visitors"].values
+    arr = []
+    count = 0
+    for event_name in event_names:
+        arr.append(
+            html.Div(className="event",
+                     children=[
+                         html.H2(
+                             event_name,
+                             className="event-name",
+                         ),
+                         html.H2(
+                             event_location,
+                             className="event-location",
+                         ),
+                         html.H2(
+                             event_time[count],
+                             className="event-time",
+                         ),
+                         html.H2(
+                             "Expected Visitors : {event_visitors}".format(
+                                 event_visitors=event_visitors[count]),
+                             className="event-numbers",
+                         )
+                     ]))
+        count = count + 1
+
+    return arr
 
 
 #------------------------------------------------------------------------------------------------
@@ -898,4 +916,4 @@ def update_table(date):
 
 if __name__ == '__main__':
 
-    app.run_server(debug=True, port=3000)
+    app.run_server(port=3000)

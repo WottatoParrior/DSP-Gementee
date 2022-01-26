@@ -91,21 +91,26 @@
   height: 300px;
   background-color: #e8e2e2;
   position: absolute;
-  top: 64%;
+  top: 61%;
   left: 74%;
   padding: 15px;
   overflow: auto;
   border-radius: 4px;
+  z-index: 20;
 }
 .event-container {
   width: 100%;
+  gap: 10px;
+  display: flex;
+  flex-direction: column;
 }
 .event {
   display: flex;
   justify-content: space-between;
-  height: 60px;
+  height: 120px;
   padding: 10px;
   background-color: white;
+  flex-wrap: wrap;
 }
 
 .venue-container {
@@ -160,6 +165,27 @@
   cursor: pointer;
 }
 
+.event-numbers {
+  font-size: 18px;
+  font-weight: 700;
+  width: 100%;
+  text-align: center;
+}
+
+.event-time {
+  font-size: 18px;
+  width: 20%;
+}
+
+.event-location {
+  font-size: 18px;
+}
+.event-name {
+  width: 100%;
+  font-size: 18px;
+  text-align: center;
+  font-weight: 800;
+}
 .info-hover-text {
   font-size: 17px;
 }
